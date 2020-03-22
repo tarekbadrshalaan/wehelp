@@ -1,0 +1,46 @@
+version: '2.3'
+
+services:
+
+  wehelp-db:
+    build:
+      context: wehelp-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGPORT: ${PGPORT}
+      POSTGRES_LOG_LEVEL: error
+    expose:
+      - ${PGPORT}
+    ports:
+      - ${PGOUTERPORT}:${PGPORT}
+    healthcheck:
+      test: (pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} && echo $$?) || exit 1
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  wehelp-api:
+    build:
+      context: wehelp-api
+    volumes:
+      - ${WEHELP_API_LOGS_EXTERNAL}:${WEHELP_API_LOGS_INTERNAL}
+    hostname: wehelp-api
+    environment:
+      WEHELP_API_DB_CONNECTION_STRING: ${WEHELP_API_DB_CONNECTION_STRING}
+      WEHELP_API_DB_ENGINE: ${WEHELP_API_DB_ENGINE}
+      WEHELP_API_ADDRESS: ${WEHELP_API_ADDRESS}
+      WEHELP_API_PORT: ${WEHELP_API_PORT}
+      WEHELP_API_SIGNED_KEY: ${WEHELP_API_SIGNED_KEY}
+      WEHELP_API_VALIDATION_DURATION: ${WEHELP_API_VALIDATION_DURATION}
+    ports:
+      - ${WEHELP_API_PORT}:${WEHELP_API_PORT}
+    expose:
+      - ${WEHELP_API_PORT}
+    depends_on:
+      wehelp-db:
+        condition: service_healthy
+
+      

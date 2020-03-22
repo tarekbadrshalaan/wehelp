@@ -1,0 +1,16 @@
+### get token based on email and password
+POST http://localhost:7070/auths/jwt-token
+Content-Type: application/json
+
+{
+    "email":"1", "password":"1"
+}
+
+### check token is valid
+GET http://localhost:7070/auths/isvalid
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEiLCJleHAiOjE2MTY0MjM3NTcsInBhc3N3b3JkIjoiMSJ9.pr__qi0aXGBnIxEvGkQTO7dNH8iZM0tHKldjrjnx130
+
+
+### renew the token based on last valid token
+GET http://localhost:7070/auths/renew
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEiLCJleHAiOjE2MTY0MjM3NTcsInBhc3N3b3JkIjoiMSJ9.pr__qi0aXGBnIxEvGkQTO7dNH8iZM0tHKldjrjnx130
