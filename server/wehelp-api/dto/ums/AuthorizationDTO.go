@@ -1,7 +1,7 @@
-package dto
+package ums
 
-// UserDTO :
-type UserDTO struct {
+// UserLoginDTO :
+type UserLoginDTO struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }

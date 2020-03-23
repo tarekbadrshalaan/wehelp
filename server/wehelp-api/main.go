@@ -7,6 +7,7 @@ import (
 
 	"wehelp-api/api"
 	"wehelp-api/config"
+	"wehelp-api/db"
 	"wehelp-api/logger"
 
 	_ "github.com/lib/pq"
@@ -24,10 +25,10 @@ func main() {
 	/* logger initialize end */
 
 	/* initialize database start */
-	// if err := db.InitDB(c.DBEngine, c.DBConnectionString); err != nil {
-	// 	panic(err)
-	// }
-	// defer db.Close()
+	if err := db.InitDB(c.DBEngine, c.DBConnectionString); err != nil {
+		panic(err)
+	}
+	defer db.Close()
 	/* initialize database end */
 
 	/* initialize webserver start */

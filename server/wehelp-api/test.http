@@ -1,3 +1,8 @@
+#########################################
+#         user management system        #
+#########################################
+
+########    AuthorizationAPI    #########
 ### get token based on email and password
 POST http://localhost:7070/auths/jwt-token
 Content-Type: application/json
@@ -14,3 +19,22 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEiLCJle
 ### renew the token based on last valid token
 GET http://localhost:7070/auths/renew
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6IjEiLCJleHAiOjE2MTY0MjM3NTcsInBhc3N3b3JkIjoiMSJ9.pr__qi0aXGBnIxEvGkQTO7dNH8iZM0tHKldjrjnx130
+
+########         UserAPI        #########
+
+### create new user
+POST http://localhost:7070/useres
+Content-Type: application/json
+
+{
+    "email":"hello@email.comv",
+    "name":"hello",
+    "password":"123",
+    "phone": "123",
+    "bio":"I'm hello"
+}
+
+
+### get user by Id
+GET http://localhost:7070/useres/1
+Content-Type: application/json

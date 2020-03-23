@@ -1,0 +1,9 @@
+{
+    "App_Name": "wehelp-api",
+    "Target_Directory": "./wehelp-api",
+    "Module": "wehelp-api",
+    "DB_CONNECTION_STRING": "host=127.0.0.1 port=5433 user=postgres password=postgres dbname=wehelpdb sslmode=disable",
+    "DB_ENGINE": "postgres",
+    "API_ADDRESS": "0.0.0.0",
+    "API_PORT": 7070
+}

@@ -1,4 +1,4 @@
-package bll
+package ums
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"wehelp-api/config"
-	"wehelp-api/dto"
+	dtoums "wehelp-api/dto/ums"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -20,7 +20,7 @@ type JwtToken struct {
 var signedKey = []byte(config.Configuration().SigendKey)
 
 // SignedJwtToken return sigened auth header
-func SignedJwtToken(user *dto.UserDTO, validationDuration time.Duration) (string, error) {
+func SignedJwtToken(user *dtoums.UserLoginDTO, validationDuration time.Duration) (string, error) {
 	if !(user.Email == "1" && user.Password == "1") { // TODO replace with database check
 		return "", errors.New("Not a registered user")
 	}
@@ -29,9 +29,8 @@ func SignedJwtToken(user *dto.UserDTO, validationDuration time.Duration) (string
 	expirationTime := time.Now().Add(validationDuration)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email":    user.Email,
-		"password": user.Password,
-		"exp":      expirationTime.Unix(),
+		"email": user.Email,
+		"exp":   expirationTime.Unix(),
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
