@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"wehelp-api/api/helper"
 
 	apiums "wehelp-api/api/ums"
 
@@ -15,15 +14,15 @@ func NewRouter() http.Handler {
 	router := httprouter.New()
 
 	for _, r := range apiums.ConfigAuthorizationRouter() {
-		router.Handle(r.Method, r.Path, helper.Logmid(r.Handle))
+		router.Handle(r.Method, r.Path, r.Handler())
 	}
 
 	for _, r := range apiums.ConfigUseresRouter() {
-		router.Handle(r.Method, r.Path, helper.Logmid(r.Handle))
+		router.Handle(r.Method, r.Path, r.Handler())
 	}
 
 	for _, r := range apiums.ConfigAddressesRouter() {
-		router.Handle(r.Method, r.Path, helper.Logmid(r.Handle))
+		router.Handle(r.Method, r.Path, r.Handler())
 	}
 
 	return router

@@ -17,9 +17,9 @@ import (
 func ConfigUseresRouter() []helper.Route {
 	return []helper.Route{
 		// helper.Route{Method: "GET", Path: "/useres", Handle: getAllUseres},
-		helper.Route{Method: "POST", Path: "/useres", Handle: postUseres},
+		helper.Route{Method: "POST", Path: "/useres", Handle: postUseres, IsLogging: true},
 		// helper.Route{Method: "PUT", Path: "/useres", Handle: putUseres},
-		helper.Route{Method: "GET", Path: "/useres/:id", Handle: getUseres},
+		helper.Route{Method: "GET", Path: "/useres/", Handle: getUseres, IsLogging: true, IsAuthorized: true},
 		// helper.Route{Method: "DELETE", Path: "/useres/:id", Handle: deleteUseres},
 	}
 }
@@ -36,10 +36,10 @@ func getAllUseres(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 
 func getUseres(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-	requestID := ps.ByName("id")
-	id, err := utils.ConvertID(requestID)
+	userIDHeader := r.Header.Get("user-id")
+	id, err := utils.ConvertID(userIDHeader)
 	if err != nil {
-		msg := fmt.Errorf("Error: parameter (id) should be int32; Id=%v; err (%v)", requestID, err)
+		msg := fmt.Errorf("Error: parameter (id) should be int32; Id=%v; err (%v)", userIDHeader, err)
 		logger.Error(msg)
 		helper.WriteResponseError(w, msg, http.StatusBadRequest)
 		return

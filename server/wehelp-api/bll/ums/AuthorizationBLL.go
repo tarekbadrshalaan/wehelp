@@ -7,7 +7,9 @@ import (
 	"time"
 
 	"wehelp-api/config"
+	dalums "wehelp-api/dal/ums"
 	dtoums "wehelp-api/dto/ums"
+	"wehelp-api/utils"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -19,17 +21,29 @@ type JwtToken struct {
 
 var signedKey = []byte(config.Configuration().SigendKey)
 
+func checkUserEmailPassword(user *dtoums.UserLoginDTO) (*dtoums.UserDTO, bool) {
+	passmd5 := utils.StringToMd5(user.Password)
+	dbuser, err := dalums.GetUserByEmailPassword(user.Email, passmd5)
+	if dbuser == nil || err != nil {
+		return nil, false
+	}
+	return &dtoums.UserDTO{ID: dbuser.ID, Email: dbuser.Email, Name: dbuser.Name}, true
+}
+
 // SignedJwtToken return sigened auth header
 func SignedJwtToken(user *dtoums.UserLoginDTO, validationDuration time.Duration) (string, error) {
-	if !(user.Email == "1" && user.Password == "1") { // TODO replace with database check
-		return "", errors.New("Not a registered user")
+	userDTO, valid := checkUserEmailPassword(user)
+	if !valid {
+		return "", errors.New("email or password is incorrect")
 	}
 
 	// Create a new token object, specifying signing method and the claims to be contained
 	expirationTime := time.Now().Add(validationDuration)
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": user.Email,
+		"id":    userDTO.ID,
+		"email": userDTO.Email,
+		"name":  userDTO.Name,
 		"exp":   expirationTime.Unix(),
 	})
 
@@ -42,8 +56,8 @@ func SignedJwtToken(user *dtoums.UserLoginDTO, validationDuration time.Duration)
 }
 
 // SignedJwtTokenRenewed returns a new signed token based on old token
-func SignedJwtTokenRenewed(authHeader string) (string, error) {
-	token, err := IsValid(authHeader)
+func SignedJwtTokenRenewed(authHeader string, userID string) (string, error) {
+	token, err := IsValid(authHeader, userID)
 	if err != nil {
 		return "", err
 	}
@@ -60,23 +74,36 @@ func SignedJwtTokenRenewed(authHeader string) (string, error) {
 	return signedToken, nil
 }
 
-// IsValid checks authentication header, returns its token metadata
-func IsValid(authHeader string) (*jwt.Token, error) {
+// IsValid checks authentication header and user-id, returns its token metadata
+func IsValid(authHeader string, userID string) (*jwt.Token, error) {
 	if authHeader == "" {
 		return nil, errors.New("An Authorization header is required")
 	}
 
+	if userID == "" {
+		return nil, errors.New("An user-id header is required")
+	}
+
 	bearerToken := strings.Split(authHeader, " ")
 	if len(bearerToken) != 2 {
-		return nil, errors.New("Invalid bearerToken length")
+		return nil, errors.New("Invalid bearer token length")
 	}
 
 	token, err := jwt.Parse(bearerToken[1], lookupValidatingKey)
-	// catch token errors
 	if err != nil {
 		return nil, err
 	}
+
 	if !token.Valid {
+		return nil, errors.New("Invalid authentication token")
+	}
+
+	mapClaims, valid := token.Claims.(jwt.MapClaims)
+	if !valid {
+		return nil, errors.New("Invalid authentication token")
+	}
+
+	if fmt.Sprint(mapClaims["id"]) != userID {
 		return nil, errors.New("Invalid authentication token")
 	}
 
